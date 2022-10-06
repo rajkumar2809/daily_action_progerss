@@ -1,0 +1,55 @@
+{% extends "dashboard.html" %}
+{% block create_project %}
+    
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6" style="margin-top: 60px;">
+            <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Project Name</th>
+                    {% if user.role == "LEAD" %}
+                        <th scope="col">Remove</th>
+                     {% endif %}
+                  </tr>
+                </thead>
+                <tbody>
+                    {% if projects %}
+                        {% for p in projects %}
+                            <tr id= "project-row{{p.id}}">
+                                <th scope="row">{{p.id}}</th>
+                                <td>{{p.name}}</td>
+                                {% if user.role == "LEAD" %}
+                                <td><button class="btn btn-danger")>Remove</button></td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                    {% endif %}
+                </tbody>
+              </table>
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <h1>Create a project </h1>
+            <form action="" method="post">
+                {% csrf_token %}
+                <!-- <div class="col-md-12"> -->
+                    <div class="form-group">
+                        <input type="text" name="project_name" id="project_name" >
+
+                    </div>
+                    <div class="form-group">
+                        <button type= "submit" class="btn btn-primary">Add Project</button>
+                    </div>
+                 <!-- </div> -->
+                
+            </form>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

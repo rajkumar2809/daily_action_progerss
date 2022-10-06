@@ -1,0 +1,509 @@
+{% extends "dashboard.html" %}
+{% block member_block %}
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h1>Today's Task </h1>
+                        <div class="display_msg" id="display_msg">
+                            <ul id="message_list">
+                                {% for t in test_list %}
+                                <li> [{{t.uname}} @ {{t.created_time}} ]:{{t.msg}} </li>
+                                {% endfor %}
+                            </ul>
+            
+
+                        <!-- Display tasks in card format starts here -->
+                        {% for t in tasks %}
+
+                                <div class="row">
+                                    <div class="col-md-4" style="margin-top: 100px;padding: 10px; ">
+
+                                        <div class="card" style="width: 18rem; ">
+                                            <!-- <img src="..." class="card-img-top" alt="..."> -->
+                                            <div class="card-body">
+                                                <h6 class="card-title">Project Name : - <b >{{t.project_name}}</b></h6>
+                                                <h6 class="card-title">Estimated Time  : - <b >{{t.estimated_time}} hr</b></h6>
+                                                <h6 class="card-title">Status  : - <b >{{t.status}}</b></h6>
+                                                <h6 class="card-title">Start Time  : - <b >{{t.created_at}}</b></h3>
+                                                
+                                                <p class="card-text">{{t.description}}</p>
+                                                {% if t.status != "COMPLETED" %}
+                                                <!-- <a href="#" class="btn btn-primary" onclick="ajax_close_task_({{t.id}})">Close</a> -->
+                                                <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#close_task_modal" onclick="ajax_close_task_({{t.id}})">Close Task</button>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div> 
+                                    {% if t.status == "COMPLETED" %}
+                                        <div class="col-md-4"  style="margin-top: 100px; margin-left: 100px;">
+                                            <div class="card" style="width: 18rem;">
+                                                <!-- <img src="..." class="card-img-top" alt="..."> -->
+                                                <div class="card-body">
+                                                    <h6 class="card-title" id="remark-{{t.id}}">Remarks  : -</h6> <p class="card-text">{{t.description}}</p>
+                                                    <h6 class="card-title">Status  : - <b >{{t.status}}</b></h6>
+                                                    <h6 class="card-title">Completed Time  : - <b >{{t.updated_at}}</b></h3>
+                                                    <h6 class="card-title">Time Taken  : - <b >{{t.time_taken}}</b></h3>
+                                                    
+                                                    
+                                                    <!-- <a href="#" class="btn btn-primary">Close</a> -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                        {% endfor %}
+                    </div>
+                        
+                        <!-- Display cards ends here -->
+                        
+                    <!-- </div> -->
+
+                    <!-- Add tasks form satrts here -->
+                    <div class="col-md-4" style="margin-top: 50px;">
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="recipient-name" class="col-form-label">Project :</label>        
+                                    <select class="form-control" aria-label="Default select example" name = "project_id">
+                                        <option selected value="0">Select Project</option>
+                                        {% for p in projects %}
+                                        <option value="{{p.id}}">{{p.name}}</option>
+                                        {% endfor %}
+                                    </select>
+                            </div>
+
+                            <div class="form-group">
+                                    <label for="select_group" class="col-form-label">Group:</label>
+                                    
+                                    <select class="form-control" aria-label="Default select example" name="select_group">
+                                        <option selected value="0">Select Group</option>
+                                        {% for key, value in groups.items %}
+                                        <option value="{{key}}">{{value}}</option>
+                                        {% endfor %}
+                                    </select>
+                            </div>
+
+                            
+                            <div class="form-group">
+                                <label for="estimated_time" class="col-form-label">Estimated Time (In hr):</label>
+                                <input type="number" class="form-control" id="estimated_time" name="estimated_time">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="user_id" class="user_id">User Id:</label>
+                                <input type="text" class="form-control" id="user_id" name="user_id" value="{{user.id}}" readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="module_name" class="module_name">Module Name:</label>
+                                <input type="text" class="form-control" id="module_name" name="module_name">
+                            </div>         
+                            
+                            <div class="form-group">
+                                <label for="status" class="col-form-label">Status :</label>
+                                
+                                <select class="form-control" aria-label="Default select example" name="status">
+                                    <option selected value="0">Task Status</option>
+                                    <option value="started">Started</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="completed">Completed</option>
+                                    <option value="in-progress">In Progress</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="description" class="description">Description:</label>
+                                <textarea type="text" class="form-control" id="description" name="description"></textarea>
+    
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                          </form>
+                    </div>
+                    <!-- Add tasks form ends here -->
+
+                </div>
+
+            </div>
+
+            {% if user.role == "LEAD" %}
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-6">
+
+                            <form action="{% url 'create_group' user.id %} " method="post">
+                                {% csrf_token %}
+                                <div class="col-md-12">
+                                    {{user.id}}
+                                    <button type= "submit" class="btn btn-primary">Add Group</button>
+                                </div>
+                                
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+            {% endif %}
+
+<!-- close model starts here -->
+
+
+<!-- Modal for edit button clicked -->
+<div class="modal fade" id="close_task_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        </div>
+        <!-- Modal starts here -->
+        <form method="post" action="{% url 'update_task_after_closed' %}">
+            {% csrf_token %}
+        <div class="modal-body">
+            <!-- <form> -->
+                <div class="row">
+                    <!-- <div class="col-md-6">
+
+                    </div> -->
+
+                    <div class="col-md-6">
+
+                        <div class="form-group">
+                            <!-- <label for="user_id" class="user_id">User Id:</label> -->
+                            <input type="hidden" class="form-control" id="user_id" name="user_id" value="{{user.id}}"  readonly>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label for="status" class="col-form-label">Status :</label>
+                            <!-- <input type="text" class="form-control" id="status"> -->
+                            
+                            <select class="form-control" aria-label="Default select example" name="status_for_close" id="status_for_close">
+                                <option selected value="0">Task Status</option>
+                                <option value="started">Started</option>
+                                <option value="pending">Pending</option>
+                                <option value="completed">Completed</option>
+                                <option value="in-progress">In Progress</option>
+                            </select>
+                        </div>
+                    </div>
+
+                <!-- </form> -->
+                </div>
+                <div class="form-group">
+                    <label for="remark" class="remark">Remark:</label>
+                    <textarea type="text" class="form-control" id="remark" name="remark"></textarea>
+
+                </div>
+                <!-- </form> -->
+                
+                <div class="form-group">
+                    <!-- <label for="task_id" class="col-form-label">Task Id:</label> -->
+                    <input type="hidden" class="form-control" id="task_id" name="task_id" readonly>
+                </div>
+
+          </div>
+        <!-- modal body ends here -->
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save changes</button>
+        </div>
+    </form>
+    </div>
+    </div>
+<!-- EDit button clicked modal closed here -->
+
+<!-- close model ends here -->
+
+<!-- Modal for edit button clicked -->
+<div class="modal fade" id="edittaskmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        </div>
+        <!-- Modal starts here -->
+        <form method="post" action="{% url 'update_task_after_submit' %}">
+            {% csrf_token %}
+        <div class="modal-body">
+            <!-- <form> -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <!-- <form> -->
+                            <div class="form-group">
+                            <label for="recipient-name" class="col-form-label">Project :</label>
+                            <!-- <input type="text" class="form-control" id="recipient-name"> -->
+    
+                                <select class="form-control" aria-label="Default select example" name = "project_id_2" id="project_id_2">
+                                    <option selected value="0">Select Project</option>
+                                    {% for p in projects %}
+                                    <option value="{{p.id}}">{{p.name}}</option>
+                                    <!-- <option value="2">MiddleWare</option>
+                                    <option value="3">ORTPSA</option> -->
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="select_group_2" class="col-form-label">Group:</label>
+                                <!-- <input type="text" class="form-control" id="select_group_2"> -->
+                                
+                                <select class="form-control" aria-label="Default select example" name="select_group_2" id="select_group_2">
+                                    <option selected value="0">Select Group</option>
+                                    {% for key, value in groups.items %}
+                                    <option value="{{key}}">{{value}}</option>
+                                    <!-- <option value="2">Content Writer</option>
+                                    <option value="3">Designer</option> -->
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label for="estimated_time_2" class="col-form-label">Estimated Time (In hr):</label>
+                                <input type="number" class="form-control" id="estimated_time_2" name="estimated_time_2">
+                            </div>
+
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <div class="form-group">
+                            <label for="user_id" class="user_id">User Id:</label>
+                            <input type="text" class="form-control" id="user_id" name="user_id" value="{{user.id}}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="module_name" class="module_name_2">Module Name:</label>
+                            <input type="text" class="form-control" id="module_name_2" name="module_name_2">
+                        </div>
+
+
+                        <div class="form-group">
+                            <label for="status" class="col-form-label">Status :</label>
+                            <!-- <input type="text" class="form-control" id="status"> -->
+                            
+                            <select class="form-control" aria-label="Default select example" name="status_2" id="status_2">
+                                <option selected value="0">Task Status</option>
+                                <option value="started">Started</option>
+                                <option value="pending">Pending</option>
+                                <option value="completed">Completed</option>
+                                <option value="in-progress">In Progress</option>
+                            </select>
+                        </div>
+                    </div>
+
+                <!-- </form> -->
+                </div>
+                <div class="form-group">
+                    <label for="description_2" class="description_2">Description:</label>
+                    <textarea type="text" class="form-control" id="description_2" name="description_2"></textarea>
+
+                </div>
+                <!-- </form> -->
+                
+                <div class="form-group">
+                    <label for="task_id" class="col-form-label">Task Id:</label>
+                    <input type="hidden" class="form-control" id="task_id" name="task_id" readonly>
+                </div>
+
+          </div>
+        <!-- modal body ends here -->
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save changes</button>
+        </div>
+    </form>
+    </div>
+    </div>
+<!-- EDit button clicked modal closed here -->
+
+<!-- script function for update starts here -->
+
+<script>
+    function autofill_task_details(task_id){
+        console.log("task id"+task_id);
+
+        $.ajax(
+        {
+            type:"POST",
+            url: "/update_task/",
+            data:{
+                    "task_id": task_id,
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            success: function( data ) 
+                {
+                    console.log(data);
+                    {% for t in tasks %}
+                        if ({{t.id}} == task_id ) {
+                            var select = document.getElementById('project_id_2');
+                            select.value = `{{t.project_id}}` ;
+                            console.log("the group id is " + `{{t.goup_id}}`);
+                            var selectgroup = document.getElementById('select_group_2');
+
+                            selectgroup.value = `{{t.goup_id}}`
+                            // var mod_name = 
+                            var mod_name = document.getElementById('module_name_2') ;
+                            mod_name.value = `{{t.module_name}}` ;      
+                            console.log(`{{t.module_name}}`);
+                            var est_time = document.getElementById('estimated_time_2') ;
+                            est_time.value = `{{t.estimated_time}}` ;
+                            console.log(`{{t.estimated_time}}`);
+                            
+                            console.log(`{{t.status}}`);
+
+                            var stat = document.getElementById('status_2');
+
+                            if (`{{t.status}}` == "STARTED" ){
+                                stat.value = "started" ;
+                            }
+                            if (`{{t.status}}` == "PENDING" ){
+                                stat.value = "pendng" ;
+                            }
+                            if (`{{t.status}}` == "IN PROGRESS" ){
+                                stat.value = "in-progress" ;
+                            }
+                            if (`{{t.status}}` == "COMPLETED" ){
+                                stat.value = "completed" ;
+                            }
+
+                            var des = document.getElementById("description_2");
+                            des.value = `{{t.description}}`
+
+                            var des = document.getElementById("task_id");
+                            des.value = `{{t.id}}`
+
+                           
+                            // mod_name.value = `{{t.module_name}}`
+                        // console.log("group id is = " + {{t.group_id}})
+                        }
+                    {% endfor %}
+                    if (data == "success"){
+                        // $("#"+data).remove();
+
+                    }
+                    // window.location.href="/individual_group/";
+                   
+                },
+            error: function()
+                {
+                    console.log("Ajax errro roccured");
+                }
+            
+        });
+    }
+</script>
+
+<!-- script function for edit ends here -->
+
+<!-- function when close button clicked starts here -->
+<script>
+function ajax_close_task_(task_id){
+    console.log("Close task button clicked ");
+    console.log(task_id);
+
+    $.ajax({
+        type:"POST",
+            url: "/update_task/",
+            data:{
+                    "task_id": task_id,
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            success: function( data ) {
+                {% for t in tasks %}
+                if ({{t.id}} == task_id ) {
+                    console.log(`{{t.status}}`);
+                    var stat = document.getElementById('status_for_close');
+
+                    if (`{{t.status}}` == "STARTED" ){
+                        stat.value = "started" ;
+                    }
+                    if (`{{t.status}}` == "PENDING" ){
+                        stat.value = "pending" ;
+                    }
+                    if (`{{t.status}}` == "IN PROGRESS" ){
+                        stat.value = "in-progress" ;
+                    }
+                    if (`{{t.status}}` == "COMPLETED" ){
+                        stat.value = "completed" ;
+                    }
+
+                    var t_id = document.getElementById('task_id');
+                    t_id.value = `{{t.id}}`;
+                }
+
+                {% endfor %}
+                console.log("Status closed successfully")
+            },
+            error : function(e){
+
+            }
+    });
+}
+</script>
+
+
+<script type="text/javascript">
+    let url = `ws://${window.location.host}/ws/send_message/` ;// + window.location.pathname ;
+        console.log(url);
+        console.log(window.location.pathname);
+        const chatSocket = new WebSocket(url)
+
+        chatSocket.onopen = function (event){
+            console.log("the connection is open....");
+            // chatSocket.send("thanks for connecting ...")
+        }
+
+        chatSocket.onmessage = function(event){
+            console.log("received message from the channels backend ...")
+            // console.log(event);
+            const ul = document.getElementById("message_list");
+            //  create a list of each message
+            var li = document.createElement('li');
+            var data = JSON.parse(event.data);
+            console.log(data);
+            console.log(data.receiver_id);
+            console.log(`{{user.id}}`);
+            if (`{{user.id}}` == data.receiver_id){
+                console.log("user id and receiver id are same")
+                 li.append(document.createTextNode(
+                '[' + data.sender_name + '@' + data.created_time + ']' + ':' +  data.currrent_message //+
+             // + data.receiver_id
+            ));
+            // ul.append(li);
+            ul.prepend(li);//'<li></li>')
+            }
+            else{
+                console.log("user id and receiver id are not same")
+  
+            }
+           
+        }
+
+
+
+        chatSocket.onclose = function (event){
+            console.log(event);
+            console.log("connection closed");
+        }
+
+        chatSocket.onerror = function (event){
+            console.log("something error occured");
+            console.log(event);
+        }
+</script>
+
+
+<!-- web socket script ends here -->
+
+<!-- function when close button clicked ends here -->
+
+{% endblock  %}
+

@@ -1,0 +1,104 @@
+{% extends "dashboard.html" %}
+{% block individual_group %}
+
+<!-- <h1>INdividual Group </h1> -->
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 " style="margin-top: 60px;">
+            {% for g in  group_name%}
+            <h1>{{g.name}}</h1>
+            <!-- <button type="button" class="btn btn-warning">{{g.name}}</button> -->
+                {% if user.role == "LEAD" %}
+                    <button type="button" class="btn btn-warning"><a href="{% url 'add_members' g.id  %}">Add Member</a></button>
+                {% endif %}
+            {% endfor %}
+            
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6" style="margin-top: 60px;">
+            <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">User Email</th>
+                    <th scope="col">First Name</th>
+                    {% if user.role == "LEAD" %}
+                        <th scope="col">Remove</th>
+                     {% endif %}
+                  </tr>
+                </thead>
+                <tbody>
+                    {% if user_list %}
+                        {% for u in user_list %}
+                            <tr id= "row{{u.id}}">
+                                <th scope="row">{{u.id}}</th>
+                                <td>{{u.email}}</td>
+                                <td>{{u.first_name}}</td>
+                                {% if user.role == "LEAD" %}
+                                <td><button class="btn btn-danger" onclick=ajax_remove_member_from_group({{u.id}})>Remove</button></td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                    {% endif %}
+                </tbody>
+              </table>
+        </div>
+        
+    </div>
+
+
+    <script type="text/javascript">
+        // $('.grp_name_btn').click(function(){
+        //     console.log("group name button clicked");
+        function ajax_remove_member_from_group(uid) {
+                console.log("Remove button clicked");
+                console.log("uid is = " +uid);
+                row_id = "row"+uid
+                console.log("the row id is =" + row_id)
+                {% for g in group_name %}
+                    var gid = {{g.id}} ;
+                    // console.log({{g.id}});
+                {% endfor %}
+                console.log("THe groupid is ");
+                console.log(gid);
+
+                 
+        // var catid;
+        // catid = $(this).attr("data-catid");
+            $.ajax(
+            {
+                type:"POST",
+                url: "/remove_member_from_group/",
+                data:{
+                        "user_id": uid,
+                        "group_id": gid,
+                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                },
+                success: function( data ) 
+                    {
+                        console.log(data);
+                        if (data == "success"){
+                            // $("#"+data).remove();
+                            var row = document.getElementById(row_id);
+                            console.log(row);
+                            console.log(uid);
+                            row.parentNode.removeChild(row);
+                        }
+                        // window.location.href="/individual_group/";
+                       
+                    },
+                error: function()
+                    {
+                        console.log("Ajax errro roccured");
+                    }
+                
+            });
+        }
+    // });
+    
+    </script>
+    
+
+{% endblock %}

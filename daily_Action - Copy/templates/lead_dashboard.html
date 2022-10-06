@@ -1,0 +1,305 @@
+
+{% extends "dashboard.html" %}
+{% block lead_dashboard %}
+<head>
+    <style>
+        .todo_class {
+      width: 100px;
+      border: 2px solid green;
+      padding: 10px;
+      /* margin-left: 5px; */
+    }
+    </style>
+</head>
+
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-6" style="margin-top:50px ;">
+                        
+                        {% block add_members %}
+
+                        {% endblock %}
+                    </div>
+                </div>
+
+                <!-- display the todays task  start her -->
+                
+                <div class="row">
+                    <div class="col-md-7">
+                        <h1>Today's Task of Members </h1>
+                        {% for tg in total_groups %}
+                        <form method="post" action="">
+                            {% csrf_token %}
+                            <input type="hidden" name="group_id" value="{{tg.id}}">
+                            <button type="submit" class="btn btn-warning" onclick="" >{{tg.name}}</button>
+                        </form>
+
+                        {% endfor %}
+
+                        <!-- Display tasks in card format starts here -->
+                        {% for t in tasks %}
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h1>{{t.first_name}}</h1>
+                                    </div>
+
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4" style="margin-top: 50px;padding: 10px; ">
+                                        
+                                        <div class="card" style="width: 18rem; ">
+                                            <!-- <img src="..." class="card-img-top" alt="..."> -->
+                                            <div class="card-body">
+                                                <h6 class="card-title" id="project_name" name="project_name">Project Name : - <b >{{t.project_name}}</b></h6>
+                                                <h6 class="card-title" name="estimated_time" id="estimated_time">Estimated Time  : - <b >{{t.estimated_time}} hr</b></h6>
+                                                <h6 class="card-title" name="status" id="status">Status  : - <b >{{t.status}}</b></h6>
+                                                <h6 class="card-title" name="started_time" id="started_time">Start Time  : - <b >{{t.created_at}}</b></h3>
+                                                
+                                                <p class="card-text" name="description" id="description">{{t.description}}</p>
+                                                {% if t.status != "COMPLETED" and user.role != "LEAD" %}
+                                                <!-- <a href="#" class="btn btn-primary" onclick="ajax_close_task_({{t.id}})">Close</a> -->
+                                                <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#add_note_modal" onclick="ajax_close_task_({{t.id}})" name="close_task" id="close_task" >Close Task</button>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div> 
+                                    {% if t.status == "COMPLETED" %}
+                                        <div class="col-md-4"  style="margin-top: 50px; margin-left: 100px;">
+                                            <div class="card" style="width: 18rem;">
+                                                <!-- <img src="..." class="card-img-top" alt="..."> -->
+                                                <div class="card-body">
+                                                    <h6 class="card-title" id="remark-{{t.id}}" name="remark" id="remark">Remarks  : -</h6> <p class="card-text">{{t.description}}</p>
+                                                    <h6 class="card-title" name="u_status" id="u_status">Status  : - <b >{{t.status}}</b></h6>
+                                                    <h6 class="card-title" name="completed_time" id="completed_time">Completed Time  : - <b >{{t.updated_at}}</b></h3>
+                                                    <h6 class="card-title" name="time_taken" id="time_taken">Time Taken  : - <b >{{t.time_taken}}</b></h3>
+                                                    
+                                                    
+                                                    <!-- <a href="#" class="btn btn-primary">Close</a> -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                        {% endfor %}
+                    </div>
+                        
+                    <!-- display the todays task ends here -->
+
+                        <!-- Display cards ends here -->
+                    <div class="col-md-5 todo_class" style="margin-top:50px ;">
+                        <h1>ToDoList / Reminder <button type="button" class="btn btn-success" data-toggle="modal" data-target="#add_note_modal">Add Notes</button> </h1> 
+                        <!-- <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#add_note_modal" onclick="ajax_close_task_({{t.id}})">Close Task</button> -->
+
+                        <!-- remider list starts here -->
+                        {% for to_do in to_do_list %}
+                        {% if to_do.status != "REMOVE" %}
+                        <div class="card" style="width: 24rem;">
+                            <div class="card-body">
+                              <h5 class="card-title">{{to_do.title}}</h5>
+                              <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                              <p class="card-text">{{to_do.description}}</p>
+                              <!-- <a href="#" class="card-link">Card link</a>
+                              <a href="#" class="card-link">Another link</a> -->
+                              {% if to_do.status != "DONE" %}
+                              <button class="btn btn-success" onclick="ajax_to_do_list({{to_do.id}})">Done</button>
+                              <button class="btn btn-success" onclick="ajax_to_do_hold_for_now({{to_do.id}})">Hold For Now</button>
+                                {% endif %}
+                                <!-- {% if to_do.status == "HOLD_FOR_NOW" %}
+                                <button class="btn btn-success" onclick="ajax_to_do_list({{to_do.id}})">Done</button>
+                                {% endif %} -->
+                                <button class="btn btn-danger" onclick="ajax_to_do_remove({{to_do.id}})">Remove</button>
+                            </div>
+                          </div>
+                          {% endif %}
+
+                        {% endfor %}
+                        
+                          <!-- reminder lists ends here -->
+
+
+                    </div>
+
+                    <!-- Button trigger modal -->
+<!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#add_note_modal">
+    Launch demo modal
+  </button> -->
+  
+  <!-- Modal -->
+  <div class="modal fade" id="add_note_modal" tabindex="-1" role="dialog" aria-labelledby="add_note_modalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form method="post" action="{% url 'add_notes' user.id%}">
+        <div class="modal-body">
+                {% csrf_token %}
+
+                <div class="form-group">
+                  <!-- <label for="notes_user_id" class="col-form-label" n>User Id:</label> -->
+                  <input type="hidden" class="form-control" id="notes_user_id" name="notes_user_id" >
+                </div>
+
+                <div class="form-group">
+                    <label for="notes_title" class="col-form-label" n>Title:</label>
+                    <input type="text" class="form-control" id="notes_title" name="notes_title">
+                  </div>
+                <div class="form-group">
+                  <label for="note" class="col-form-label">Note:</label>
+                  <textarea class="form-control" id="note" name="note"></textarea>
+                </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Save Note</button>
+        </div>
+    </form>
+      </div>
+    </div>
+  </div>
+  <!-- Modal ends -->
+
+                </div>
+            </div>
+
+            
+
+<!-- 
+<script>
+    function group_button_clicked_to_view_tasks(gid){
+        console.log("group_button_clicked_to_view_tasks");
+
+        $.ajax({
+        type:"POST",
+            url: "/lead_dashboard/{{user.id}}",
+            data:{
+                    "group_id": gid,
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            success: function( data) {
+                console.log("Successfully viewed the tasks as per grouops");
+                // console.log(data);
+                // console.log(length(data))
+                console.log(typeof(data));
+                console.log(`{{tasks}}`)
+                {% for t in task %}
+                    console.log(`{{t.id}}`);
+
+                {% endfor %}
+                // i = 0
+        
+                // console.log(name);
+                // {% for t in tasks %}
+                // if ({{t.id}} == task_id ) {
+                //     console.log(`{{t.status}}`);
+                //     var stat = document.getElementById('status_for_close');
+
+                //     if (`{{t.status}}` == "STARTED" ){
+                //         stat.value = "started" ;
+                //     }
+                //     if (`{{t.status}}` == "PENDING" ){
+                //         stat.value = "pending" ;
+                //     }
+                //     if (`{{t.status}}` == "IN PROGRESS" ){
+                //         stat.value = "in-progress" ;
+                //     }
+                //     if (`{{t.status}}` == "COMPLETED" ){
+                //         stat.value = "completed" ;
+                //     }
+
+                //     var t_id = document.getElementById('task_id');
+                //     t_id.value = `{{t.id}}`;
+                // }
+
+                // {% endfor %}
+                // console.log("Status closed successfully")
+            },
+            error : function(e){
+
+            }
+    });
+
+    }
+</script> -->
+
+<script>
+
+    function ajax_to_do_list(todo_id){
+
+        console.log("Task to be done " );
+        console.log(todo_id);
+
+        $.ajax({
+            type:"POST",
+            url: "/to_do_update/{{user.id}}",
+            data:{
+                    "todo_id": todo_id,
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            success: function( data) {
+                console.log("Successfully notes updated to done");
+                console.log(data);
+                // console.log(length(data))
+            },
+            error: function (e){
+
+            }
+        });
+    }
+
+    function ajax_to_do_remove(todo_id){
+
+        console.log("Task to be done " );
+        console.log(todo_id);
+
+        $.ajax({
+            type:"POST",
+            url: "/to_do_remove/{{user.id}}",
+            data:{
+                    "todo_id": todo_id,
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            success: function( data) {
+                console.log("Successfully Deleted the notes");
+                console.log(data);
+                // console.log(length(data))
+            },
+            error: function (e){
+
+            }
+        });
+        }
+
+        
+
+        function ajax_to_do_hold_for_now(todo_id){
+
+            console.log("Task to be done " );
+            console.log(todo_id);
+
+            $.ajax({
+                type:"POST",
+                url: "/to_do_hold_for_now/{{user.id}}",
+                data:{
+                        "todo_id": todo_id,
+                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                },
+                success: function( data) {
+                    console.log("Successfully Deleted the notes");
+                    console.log(data);
+                    // console.log(length(data))
+                },
+                error: function (e){
+
+                }
+            });
+            }
+
+</script>
+
+{% endblock  %}
+
+

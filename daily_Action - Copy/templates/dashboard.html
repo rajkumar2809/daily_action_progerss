@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+        <title>Collapsible sidebar using Bootstrap 4</title>
+    
+        <!-- Bootstrap CSS CDN -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+        <!-- Our Custom CSS -->
+        <!-- <link rel="stylesheet" href="style.css"> -->
+        <link rel="stylesheet" href="{% static '/css/dashboard.css/' %}">
+        <link href="{% static '/css/register.css' %}" rel="stylesheet" >
+        <link rel="stylesheet" href="{% static 'bootstrap/css/bootstarp.min.css' %}">
+
+
+    
+        <!-- Font Awesome JS -->
+        <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/solid.js" integrity="sha384-tzzSw1/Vo+0N5UhStP3bvwWPq+uvzCMfrN1fEFe+xBmv1C/AtVX5K0uZtmcHitFZ" crossorigin="anonymous"></script>
+        <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/fontawesome.js" integrity="sha384-6OIrr52G08NpOFSZdxxz1xdNSndlD4vdcf/q2myIUVO0VsqaGHJsB0RaBE01VTOY" crossorigin="anonymous"></script>
+
+        <style>
+            /* .wrapper {
+                display: flex;
+                width: 100%;
+                align-items: stretch;
+            }
+
+            #sidebar {
+                min-width: 250px;
+                max-width: 250px;
+                min-height: 100vh;
+            }
+
+            #sidebar.active {
+                margin-left: -250px;
+            }
+
+            a[data-toggle="collapse"] {
+                position: relative;
+            }
+
+            .dropdown-toggle::after {
+                display: block;
+                position: absolute;
+                top: 50%;
+                right: 20px;
+                transform: translateY(-50%);
+            }
+
+            @media (max-width: 768px) {
+                #sidebar {
+                    margin-left: -250px;
+                }
+                #sidebar.active {
+                    margin-left: 0;
+                }
+            }
+             */
+        </style>
+    </head>
+    
+    <body>
+
+        <!-- Dashboard starts here -->
+        <div class="wrapper">
+            <!-- Sidebar -->
+            <nav id="sidebar">
+                <div class="sidebar-header">
+                    <h3>Daily Plan and Progress </h3>
+                </div>
+        
+                <ul class="list-unstyled components">
+                    <p>Welcome {{user.first_name}} ,</p>
+
+                    {% if user.role == "LEAD" %}
+                    <li class="home" onClick="add_class_active(this.getAttribute('class'));">
+                        <a href="{% url 'lead_dashboard' user.id %}">Home</a>
+                    </li>
+                    {% endif %}
+                    {% if user.role == "MEMBER" %}
+                    <li class="home" onClick="add_class_active(this.getAttribute('class'));">
+                        <a href="{% url 'member_dashboard' user.id %}">Home</a>
+                    </li>
+                    {% endif %}
+                    {% if user.role == "ADMIN" or user.role == "LEAD" %}
+
+                    <li>
+                        <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Groups</a>
+                        <ul class="collapse list-unstyled" id="homeSubmenu">
+                            <li class="create_group" onClick="add_class_active(this.getAttribute('class'));">
+                                <a href="{% url 'create_group' user.id %}">Create Group</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'view_group' user.id %}">View Groups </a>
+                            </li>
+                            <!-- <li>
+                                <a href="#">Home 3</a>
+                            </li> -->
+                        </ul>
+                    </li>
+                    
+                    <li>
+                        <a href="{% url 'view_member' %}">Members</a>
+                    </li>
+                    <li>
+                        <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Projects</a>
+                        <ul class="collapse list-unstyled" id="pageSubmenu">
+                            <li>
+                                <a href="{% url 'create_project' user.id %}">Create Project</a>
+                            </li>
+                            <li>
+                                <a href="#">View Projects</a>
+                            </li>
+                            <!-- <li>
+                                <a href="#">Page 3</a>
+                            </li> -->
+                        </ul>
+                    </li>
+                    {% endif %}
+
+                    {% if user.role == "MEMBER" %}
+                    <li>
+                        <a href="{% url 'view_groups_for_member' user.id %}">Groups</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'view_member' %}">Members</a>
+                    </li>
+                    {% endif %}
+                    <li>
+                        <a href="{% url 'member_tasks' user.id %}">View Tasks</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'chat' user.first_name %}">Message</a>
+                    </li>
+                    <li>
+                        <a href="#">Account</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'logout' %}">Logout</a>
+                    </li>
+                </ul>
+            </nav>
+
+            
+            {% block register_block %}
+
+            {% endblock %}
+            {% block view_employee  %}
+
+            {% endblock %}
+ 
+            {% block add_group %}
+
+            {% endblock  %}
+
+            {% block lead_dashboard %}
+
+            {% endblock  %}
+
+            
+            {% block view_group %}
+
+            {% endblock  %}
+
+            {% block view_member %}
+
+            {% endblock  %}
+
+            {% block chat_message %}
+
+            {% endblock  %}
+
+            {% block individual_group %}
+
+            {% endblock %}
+
+            {% block member_block %}
+
+            {% endblock %}
+
+            {% block create_project %}
+            
+            {% endblock %}
+            
+            {% block member_task %}
+
+            {% endblock %}
+        
+        </div>
+
+        <div id="content">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <div class="container-fluid">
+        
+                    <button type="button" id="sidebarCollapse" class="btn btn-info">
+                        <i class="fas fa-align-left"></i>
+                        <span>Toggle Sidebar</span>
+                    </button>
+        
+                </div>
+            </nav>
+
+        </div>
+
+        <!-- dashboard ends here -->
+    
+    
+        <!-- jQuery CDN - Slim version (=without AJAX) -->
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <!-- Popper.JS -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+        <!-- Bootstrap JS -->
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+    
+        <script>
+            $(document).ready(function () {
+
+            $('#sidebarCollapse').on('click', function () {
+                $('#sidebar').toggleClass('active');
+            });
+
+            });
+
+            //  active the buttons of the dashboard on  click
+            var el_down = document.getElementById("gfg");
+            function add_class_active(className) {
+                // This function is called, when the 
+                // click event occurs on any element.
+                // get the classname of element.
+                // el_down.innerHTML = "Class = " + className; 
+            }   
+
+            $('#sidebar ul li').on('click', function () {
+                console.log("sidebar option clicked");
+                val = `kasdnm
+                asdkamsd
+                asdkmasd`;
+                console.log(val);
+             $('#sidebar ul .active').removeClass('active');
+            $(this).addClass('active');
+            console.log($(this))
+        });
+        </script>
+           <script src="{% static '/bootstrap/js/bootstrap.min.js' %}"></script>
+           <script src="{% static '/js/jquery-3.6.min.js' %}"></script>
+
+
+
+    </body>
+</html>

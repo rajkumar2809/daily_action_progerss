@@ -1,0 +1,398 @@
+{% extends "dashboard.html" %}
+{% block member_task %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 " style="margin-top: 60px;">
+            <h1>View tasks and add tasks here</h1>
+            <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#exampleModalCenter">Add Tasks</button>
+        </div>
+        <!-- modal to add tasks starts here -->
+        <!-- Button trigger modal -->
+        <!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
+            Launch demo modal
+        </button> -->
+        
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                </div>
+                <!-- Modal starts here -->
+                <form method="post">
+                    {% csrf_token %}
+                <div class="modal-body">
+                    <!-- <form> -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <!-- <form> -->
+                                    <div class="form-group">
+                                    <label for="recipient-name" class="col-form-label">Project :</label>
+                                    <!-- <input type="text" class="form-control" id="recipient-name"> -->
+            
+                                        <select class="form-control" aria-label="Default select example" name = "project_id">
+                                            <option selected value="0">Select Project</option>
+                                            {% for p in projects %}
+                                            <option value="{{p.id}}">{{p.name}}</option>
+                                            <!-- <option value="2">MiddleWare</option>
+                                            <option value="3">ORTPSA</option> -->
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="select_group" class="col-form-label">Group:</label>
+                                        <!-- <input type="text" class="form-control" id="select_group"> -->
+                                        
+                                        <select class="form-control" aria-label="Default select example" name="select_group">
+                                            <option selected value="0">Select Group</option>
+                                            {% for key, value in groups.items %}
+                                            <option value="{{key}}">{{value}}</option>
+                                            <!-- <option value="2">Content Writer</option>
+                                            <option value="3">Designer</option> -->
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="estimated_time" class="col-form-label">Estimated Time (In hr):</label>
+                                        <input type="number" class="form-control" id="estimated_time" name="estimated_time">
+                                    </div>
+
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <div class="form-group">
+                                    <label for="user_id" class="user_id">User Id:</label>
+                                    <input type="text" class="form-control" id="user_id" name="user_id" value="{{user.id}}" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label for="module_name" class="module_name">Module Name:</label>
+                                    <input type="text" class="form-control" id="module_name" name="module_name">
+                                </div>
+
+
+                                <div class="form-group">
+                                    <label for="status" class="col-form-label">Status :</label>
+                                    <!-- <input type="text" class="form-control" id="status"> -->
+                                    
+                                    <select class="form-control" aria-label="Default select example" name="status">
+                                        <option selected value="0">Task Status</option>
+                                        <option value="started">Started</option>
+                                        <option value="pending">Pending</option>
+                                        <option value="completed">Completed</option>
+                                        <option value="in-progress">In Progress</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                        <!-- </form> -->
+                        </div>
+                        <div class="form-group">
+                            <label for="description" class="description">Description:</label>
+                            <textarea type="text" class="form-control" id="description" name="description"></textarea>
+
+                        </div>
+                        <!-- </form> -->
+
+                  </div>
+                <!-- modal body ends here -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+            </div>
+            </div>
+        </div>
+        <!-- modal to add tasks ends here -->
+        
+    <!-- </div>
+
+</div>
+<div class="container">
+    <div class="row"> -->
+        <div class="col-md-12">
+            <table class="table table-striped table-bordered">
+                <thead>
+                  <tr>
+                    <th scope="col">Task ID</th>
+                    <th scope="col">Project</th>
+                    <th scope="col">Module Name</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Estimated Time</th>
+                    <th scope="col">Started Time</th>
+                    <th scope="col">Completion Time</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Total HOur</th>
+                    <th scope="col">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    {% for t in tasks %}
+                  <tr>
+                    <th scope="row">{{t.id}}</th>
+                    <td>{{t.project_id}}</td>
+                    <td>{{t.module_name}}</td>
+                    <td>{{t.description}}</td>
+                    <td>{{t.estimated_time}}</td>
+                    <td>{{t.created_at}}</td>
+                    <td>{{t.updated_at}}</td>
+                    <td>{{t.status}}</td>
+                    <td>5</td>
+                    <td>
+                        <!-- <button class="btn btn-warning" onclick="ajax_edit_task({{t.id}})">Edit</button> -->
+                        <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#edittaskmodal" onclick="autofill_task_details({{t.id}})">Edit</button>
+
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Modal for edit button clicked -->
+<div class="modal fade" id="edittaskmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        </div>
+        <!-- Modal starts here -->
+        <form method="post" action="{% url 'update_task_after_submit' %}">
+            {% csrf_token %}
+        <div class="modal-body">
+            <!-- <form> -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <!-- <form> -->
+                            <div class="form-group">
+                            <label for="recipient-name" class="col-form-label">Project :</label>
+                            <!-- <input type="text" class="form-control" id="recipient-name"> -->
+    
+                                <select class="form-control" aria-label="Default select example" name = "project_id_2" id="project_id_2">
+                                    <option selected value="0">Select Project</option>
+                                    {% for p in projects %}
+                                    <option value="{{p.id}}">{{p.name}}</option>
+                                    <!-- <option value="2">MiddleWare</option>
+                                    <option value="3">ORTPSA</option> -->
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="select_group" class="col-form-label">Group:</label>
+                                <!-- <input type="text" class="form-control" id="select_group"> -->
+                                
+                                <select class="form-control" aria-label="Default select example" name="select_group_2" id="select_group_2">
+                                    <option selected value="0">Select Group</option>
+                                    {% for key, value in groups.items %}
+                                    <option value="{{key}}">{{value}}</option>
+                                    <!-- <option value="2">Content Writer</option>
+                                    <option value="3">Designer</option> -->
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label for="estimated_time_2" class="col-form-label">Estimated Time (In hr):</label>
+                                <input type="number" class="form-control" id="estimated_time_2" name="estimated_time_2">
+                            </div>
+
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <div class="form-group">
+                            <label for="user_id" class="user_id">User Id:</label>
+                            <input type="text" class="form-control" id="user_id" name="user_id" value="{{user.id}}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="module_name" class="module_name_2">Module Name:</label>
+                            <input type="text" class="form-control" id="module_name_2" name="module_name_2">
+                        </div>
+
+
+                        <div class="form-group">
+                            <label for="status" class="col-form-label">Status :</label>
+                            <!-- <input type="text" class="form-control" id="status"> -->
+                            
+                            <select class="form-control" aria-label="Default select example" name="status_2" id="status_2">
+                                <option selected value="0">Task Status</option>
+                                <option value="started">Started</option>
+                                <option value="pending">Pending</option>
+                                <option value="completed">Completed</option>
+                                <option value="in-progress">In Progress</option>
+                            </select>
+                        </div>
+                    </div>
+
+                <!-- </form> -->
+                </div>
+                <div class="form-group">
+                    <label for="description_2" class="description_2">Description:</label>
+                    <textarea type="text" class="form-control" id="description_2" name="description_2"></textarea>
+
+                </div>
+                <!-- </form> -->
+                
+                <div class="form-group">
+                    <label for="task_id" class="col-form-label">Task Id:</label>
+                    <input type="hidden" class="form-control" id="task_id" name="task_id" readonly>
+                </div>
+
+          </div>
+        <!-- modal body ends here -->
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save changes</button>
+        </div>
+    </form>
+    </div>
+    </div>
+<!-- EDit button clicked modal closed here -->
+
+<script>
+    function autofill_task_details(task_id){
+        console.log("task id");
+
+        $.ajax(
+        {
+            type:"POST",
+            url: "/update_task/",
+            data:{
+                    "task_id": task_id,
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            success: function( data ) 
+                {
+                    console.log(data);
+                    {% for t in tasks %}
+                        if ({{t.id}} == task_id ) {
+                            var select = document.getElementById('project_id_2');
+                            select.value = `{{t.project_id}}` ;
+                            console.log("the group id is " + `{{t.goup_id}}`);
+                            var selectgroup = document.getElementById('select_group_2');
+
+                            selectgroup.value = `{{t.goup_id}}`
+                            // var mod_name = 
+                            var mod_name = document.getElementById('module_name_2') ;
+                            mod_name.value = `{{t.module_name}}` ;
+                            console.log(`{{t.module_name}}`);
+                            var est_time = document.getElementById('estimated_time_2') ;
+                            est_time.value = `{{t.estimated_time}}` ;
+                            console.log(`{{t.estimated_time}}`);
+                            
+                            console.log(`{{t.status}}`);
+
+                            var stat = document.getElementById('status_2');
+
+                            if (`{{t.status}}` == "STARTED" ){
+                                stat.value = "started" ;
+                            }
+                            if (`{{t.status}}` == "PENDING" ){
+                                stat.value = "pendng" ;
+                            }
+                            if (`{{t.status}}` == "IN PROGRESS" ){
+                                stat.value = "in-progress" ;
+                            }
+                            if (`{{t.status}}` == "COMPLETED" ){
+                                stat.value = "completed" ;
+                            }
+
+                            var des = document.getElementById("description_2");
+                            des.value = `{{t.description}}`
+
+                            var des = document.getElementById("task_id");
+                            des.value = `{{t.id}}`
+
+                           
+                            // mod_name.value = `{{t.module_name}}`
+                        // console.log("group id is = " + {{t.group_id}})
+                        }
+                    {% endfor %}
+                    if (data == "success"){
+                        // $("#"+data).remove();
+
+                    }
+                    // window.location.href="/individual_group/";
+                   
+                },
+            error: function()
+                {
+                    console.log("Ajax errro roccured");
+                }
+            
+        });
+    }
+</script>
+
+<!-- 
+<script type="text/javascript">
+    // $('.grp_name_btn').click(function(){
+    //     console.log("group name button clicked");
+    function ajax_edit_task(task_id) {
+            console.log("Edit button clicked");
+            console.log("task id is = " +uid);
+            row_id = "row"+uid
+            console.log("the row id is =" + row_id)
+            {% for g in group_name %}
+                var gid = {{g.id}} ;
+                // console.log({{g.id}});
+            {% endfor %}
+            console.log("THe groupid is ");
+            console.log(gid);
+
+             
+    // var catid;
+    // catid = $(this).attr("data-catid");
+        $.ajax(
+        {
+            type:"POST",
+            url: "/remove_member_from_group/",
+            data:{
+                    "user_id": uid,
+                    "group_id": gid,
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            success: function( data ) 
+                {
+                    console.log(data);
+                    if (data == "success"){
+                        // $("#"+data).remove();
+                        var row = document.getElementById(row_id);
+                        console.log(row);
+                        console.log(uid);
+                        row.parentNode.removeChild(row);
+                    }
+                    // window.location.href="/individual_group/";
+                   
+                },
+            error: function()
+                {
+                    console.log("Ajax errro roccured");
+                }
+            
+        });
+    }
+// });
+
+</script> -->
+
+{% endblock %}

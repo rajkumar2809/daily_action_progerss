@@ -1,0 +1,26 @@
+{% extends "dashboard.html" %}
+{% load static %}
+{% block member_block %}
+
+    
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 " style="margin-top: 60px;">
+                <h1>You are the member of following Groups</h1>
+                <h1>Groups are</h1>
+                {% for key, value in groups.items %}
+                <!-- <button type="button" class="btn btn-warning">{{g.name}}</button> -->
+                <form action="{% url 'individual_group' key %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-warning grp_name_btn" >{{value}}</button> 
+                </form>
+                <!-- <button type="button" class="btn btn-warning grp_name_btn" onclick=ajax_view_group_member({{g.id}},{{user.id}})>{{g.name}}</button> -->
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+
+    <script src="{% static 'js/jquesry-3.6.min.js' %}" ></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+{% endblock %}

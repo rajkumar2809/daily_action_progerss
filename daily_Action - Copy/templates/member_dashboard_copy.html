@@ -1,0 +1,66 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>
+        Welcome Member ,
+    </h1>
+</body>
+</html> -->
+
+
+<!DOCTYPE html>
+
+{% extends "dashboard.html" %}
+{% block member_block %}
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h1>Member </h1>
+                        {% for t in tasks %}
+                        <div class="card" style="width: 18rem;">
+                            <!-- <img src="..." class="card-img-top" alt="..."> -->
+                            <div class="card-body">
+                                {% for g in group_name %}
+                              <h5 class="card-title">Group Name : - <b style="color: yellow ; background-color:aqua">{{g}}</b></h5>
+                                {% endfor %}
+                                
+                              <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                              <a href="#" class="btn btn-primary">Go somewhere</a>
+                            </div>
+                          </div>
+                          {% endfor %}
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% if user.role == "LEAD" %}
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-6">
+
+                            <form action="{% url 'create_group' user.id %} " method="post">
+                                {% csrf_token %}
+                                <div class="col-md-12">
+                                    {{user.id}}
+                                    <button type= "submit" class="btn btn-primary">Add Group</button>
+                                </div>
+                                
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+            {% endif %}
+
+{% endblock  %}
+
+</html>
+

@@ -1,0 +1,82 @@
+{% extends 'admin_dashboard.html' %}
+{% block view_employee  %}
+{% load static %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css" />
+<script src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
+<div class="pageholder">
+    <div class="titleholder"> 
+        <!-- <a class="ourbutton mr-2 ml-2" href=""> To home</a> -->
+        <div class="title"><i class="fa-solid fa-table"></i> <h1>View Employee Table </h1> </div> 
+    </div>
+
+    <div class="table table-bordered">
+        <table id="ourtable2" class="beheertable dezetabel">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>User Name</th>
+                    <th>User Role</th>
+                    <!-- <th>Edited at</th> -->
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users%}
+                <tr>
+                    <th scope="row">{{user.id}}</th>
+                    <td>{{user.first_name}}</td>
+                    <td>{{user.last_name}}</td>
+                    <td>{{user.user_name}}</td>
+                    {% if user.is_superuser %}
+                        <td>SUPER</td>
+                    {% else %}
+                    <td> {{user.role}}</td>
+
+                    {% endif %}
+                  </tr>
+                
+                {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="{% static 'js/jquery-3.6.min.js' %}"></script>
+
+<script>
+// jQuery(document).ready(function() {
+//     var table = jQuery('#ourtable2').DataTable({
+//        "ajax": {
+//           "processing": true,
+//           "url": "{% url 'view_employee' %}",
+//           "dataSrc": "",
+//         },
+//         "columns": [
+//                 { "data": "id"},
+//                 { "data": "first_name)"},
+//                 { "data": "last_name"},
+//                 { "data": "user_name"},
+//                 // { "data": "role"},
+//             ],
+//     });
+// });
+
+
+</script>
+
+<script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+{% endblock %}
+
+<!-- // <script> -->
+<!-- //     jQuery.ajax({
+//         url: "{% url 'view_employee'%}",
+//         method: 'GET',
+//         success: function (data) {
+//             console.log('our data',data);
+//         }
+//     });
+//  -->
+<!-- // < -->

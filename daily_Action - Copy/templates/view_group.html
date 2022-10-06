@@ -1,0 +1,67 @@
+{% extends "dashboard.html" %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'bootstrap/css/bootstarp.min.css' %}">
+
+
+
+{% block view_group %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 " style="margin-top: 60px;">
+            <h1>Groups are</h1>
+            {% for g in groups %}
+            <!-- <button type="button" class="btn btn-warning">{{g.name}}</button> -->
+            <form action="{% url 'individual_group' g.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-warning grp_name_btn" >{{g.name}}</button> 
+            </form>
+            <!-- <button type="button" class="btn btn-warning grp_name_btn" onclick=ajax_view_group_member({{g.id}},{{user.id}})>{{g.name}}</button> -->
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+
+<script src="{% static 'js/jquesry-3.6.min.js' %}" ></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+
+<script type="text/javascript">
+    // $('.grp_name_btn').click(function(){
+    //     console.log("group name button clicked");
+    function ajax_view_group_member(gid , uid){
+        console.log("group name button clicked");
+        console.log("group id is = " + gid);
+        console.log("uid is = " +uid);
+
+    // var catid;
+    // catid = $(this).attr("data-catid");
+        $.ajax(
+        {
+            type:"POST",
+            url: "/individual_group/",
+            data:{
+                    "user_id": uid,
+                    "group_id": gid,
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            success: function( data ) 
+                {
+                    console.log(data);
+                    window.location.href="/individual_group/";
+                   
+                },
+            error: function()
+                {
+                    console.log("Ajax errro roccured");
+                }
+            
+        })
+    }
+// });
+
+</script>
+
+
+{% endblock  %}

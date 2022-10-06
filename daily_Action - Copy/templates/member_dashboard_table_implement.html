@@ -1,0 +1,341 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>
+        Welcome Member ,
+    </h1>
+</body>
+</html> -->
+
+
+
+{% extends "dashboard.html" %}
+{% block member_block %}
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h1>Today's Task </h1>
+
+                        <table class="table table-bordered">
+                            <thead>
+                              <tr>
+                                <th scope="col">TASK ID</th>
+                                <th scope="col">Project Name</th>
+                                <th scope="col">Estimated Time</th>
+                                <th scope="col">Description</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Action</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                                {% if tasks %}
+                                    {% for t in tasks %}
+                                        {% for p in project_name %}
+
+                                        <tr id= "task-row{{t.id}}">
+                                            <th scope="row">{{t.id}}</th>
+                                                <td>{{p.name}}</td>
+                                            <td>{{t.estimated_time}}</td>
+                                            <td>{{t.description}}</td>
+                                            <td>{{t.status}}</td>
+                                            <!-- <td><button class="btn btn-warning" id="edittaskmodal")>Edit</button></td> -->
+                                            <td>
+                                                <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#edittaskmodal" onclick="autofill_task_details({{t.id}})">Edit</button>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    {% endfor %}
+                                {% endif %}
+                            </tbody>
+                          </table>
+                    </div>
+
+                    <!-- Add tasks form satrts here -->
+                    <div class="col-md-4" style="margin-top: 50px;">
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="recipient-name" class="col-form-label">Project :</label>
+                                <!-- <input type="text" class="form-control" id="recipient-name"> -->
+        
+                                    <select class="form-control" aria-label="Default select example" name = "project_id">
+                                        <option selected value="0">Select Project</option>
+                                        {% for p in projects %}
+                                        <option value="{{p.id}}">{{p.name}}</option>
+                                        <!-- <option value="2">MiddleWare</option>
+                                        <option value="3">ORTPSA</option> -->
+                                        {% endfor %}
+                                    </select>
+                            </div>
+
+                            <div class="form-group">
+                                    <label for="select_group" class="col-form-label">Group:</label>
+                                    <!-- <input type="text" class="form-control" id="select_group"> -->
+                                    
+                                    <select class="form-control" aria-label="Default select example" name="select_group">
+                                        <option selected value="0">Select Group</option>
+                                        {% for key, value in groups.items %}
+                                        <option value="{{key}}">{{value}}</option>
+                                        <!-- <option value="2">Content Writer</option>
+                                        <option value="3">Designer</option> -->
+                                        {% endfor %}
+                                    </select>
+                            </div>
+
+                            
+                            <div class="form-group">
+                                <label for="estimated_time" class="col-form-label">Estimated Time (In hr):</label>
+                                <input type="number" class="form-control" id="estimated_time" name="estimated_time">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="user_id" class="user_id">User Id:</label>
+                                <input type="text" class="form-control" id="user_id" name="user_id" value="{{user.id}}" readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="module_name" class="module_name">Module Name:</label>
+                                <input type="text" class="form-control" id="module_name" name="module_name">
+                            </div>         
+                            
+                            <div class="form-group">
+                                <label for="status" class="col-form-label">Status :</label>
+                                <!-- <input type="text" class="form-control" id="status"> -->
+                                
+                                <select class="form-control" aria-label="Default select example" name="status">
+                                    <option selected value="0">Task Status</option>
+                                    <option value="started">Started</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="completed">Completed</option>
+                                    <option value="in-progress">In Progress</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="description" class="description">Description:</label>
+                                <textarea type="text" class="form-control" id="description" name="description"></textarea>
+    
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                          </form>
+                    </div>
+                    <!-- Add tasks form ends here -->
+
+                </div>
+
+            </div>
+
+            {% if user.role == "LEAD" %}
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-6">
+
+                            <form action="{% url 'create_group' user.id %} " method="post">
+                                {% csrf_token %}
+                                <div class="col-md-12">
+                                    {{user.id}}
+                                    <button type= "submit" class="btn btn-primary">Add Group</button>
+                                </div>
+                                
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+            {% endif %}
+
+
+<!-- Modal for edit button clicked -->
+<div class="modal fade" id="edittaskmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        </div>
+        <!-- Modal starts here -->
+        <form method="post" action="{% url 'update_task_after_submit' %}">
+            {% csrf_token %}
+        <div class="modal-body">
+            <!-- <form> -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <!-- <form> -->
+                            <div class="form-group">
+                            <label for="recipient-name" class="col-form-label">Project :</label>
+                            <!-- <input type="text" class="form-control" id="recipient-name"> -->
+    
+                                <select class="form-control" aria-label="Default select example" name = "project_id_2" id="project_id_2">
+                                    <option selected value="0">Select Project</option>
+                                    {% for p in projects %}
+                                    <option value="{{p.id}}">{{p.name}}</option>
+                                    <!-- <option value="2">MiddleWare</option>
+                                    <option value="3">ORTPSA</option> -->
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="select_group_2" class="col-form-label">Group:</label>
+                                <!-- <input type="text" class="form-control" id="select_group_2"> -->
+                                
+                                <select class="form-control" aria-label="Default select example" name="select_group_2" id="select_group_2">
+                                    <option selected value="0">Select Group</option>
+                                    {% for key, value in groups.items %}
+                                    <option value="{{key}}">{{value}}</option>
+                                    <!-- <option value="2">Content Writer</option>
+                                    <option value="3">Designer</option> -->
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label for="estimated_time_2" class="col-form-label">Estimated Time (In hr):</label>
+                                <input type="number" class="form-control" id="estimated_time_2" name="estimated_time_2">
+                            </div>
+
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <div class="form-group">
+                            <label for="user_id" class="user_id">User Id:</label>
+                            <input type="text" class="form-control" id="user_id" name="user_id" value="{{user.id}}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="module_name" class="module_name_2">Module Name:</label>
+                            <input type="text" class="form-control" id="module_name_2" name="module_name_2">
+                        </div>
+
+
+                        <div class="form-group">
+                            <label for="status" class="col-form-label">Status :</label>
+                            <!-- <input type="text" class="form-control" id="status"> -->
+                            
+                            <select class="form-control" aria-label="Default select example" name="status_2" id="status_2">
+                                <option selected value="0">Task Status</option>
+                                <option value="started">Started</option>
+                                <option value="pending">Pending</option>
+                                <option value="completed">Completed</option>
+                                <option value="in-progress">In Progress</option>
+                            </select>
+                        </div>
+                    </div>
+
+                <!-- </form> -->
+                </div>
+                <div class="form-group">
+                    <label for="description_2" class="description_2">Description:</label>
+                    <textarea type="text" class="form-control" id="description_2" name="description_2"></textarea>
+
+                </div>
+                <!-- </form> -->
+                
+                <div class="form-group">
+                    <label for="task_id" class="col-form-label">Task Id:</label>
+                    <input type="hidden" class="form-control" id="task_id" name="task_id" readonly>
+                </div>
+
+          </div>
+        <!-- modal body ends here -->
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save changes</button>
+        </div>
+    </form>
+    </div>
+    </div>
+<!-- EDit button clicked modal closed here -->
+
+<!-- script function for update starts here -->
+
+<script>
+    function autofill_task_details(task_id){
+        console.log("task id"+task_id);
+
+        $.ajax(
+        {
+            type:"POST",
+            url: "/update_task/",
+            data:{
+                    "task_id": task_id,
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            success: function( data ) 
+                {
+                    console.log(data);
+                    {% for t in tasks %}
+                        if ({{t.id}} == task_id ) {
+                            var select = document.getElementById('project_id_2');
+                            select.value = `{{t.project_id}}` ;
+                            console.log("the group id is " + `{{t.goup_id}}`);
+                            var selectgroup = document.getElementById('select_group_2');
+
+                            selectgroup.value = `{{t.goup_id}}`
+                            // var mod_name = 
+                            var mod_name = document.getElementById('module_name_2') ;
+                            mod_name.value = `{{t.module_name}}` ;      
+                            console.log(`{{t.module_name}}`);
+                            var est_time = document.getElementById('estimated_time_2') ;
+                            est_time.value = `{{t.estimated_time}}` ;
+                            console.log(`{{t.estimated_time}}`);
+                            
+                            console.log(`{{t.status}}`);
+
+                            var stat = document.getElementById('status_2');
+
+                            if (`{{t.status}}` == "STARTED" ){
+                                stat.value = "started" ;
+                            }
+                            if (`{{t.status}}` == "PENDING" ){
+                                stat.value = "pendng" ;
+                            }
+                            if (`{{t.status}}` == "IN PROGRESS" ){
+                                stat.value = "in-progress" ;
+                            }
+                            if (`{{t.status}}` == "COMPLETED" ){
+                                stat.value = "completed" ;
+                            }
+
+                            var des = document.getElementById("description_2");
+                            des.value = `{{t.description}}`
+
+                            var des = document.getElementById("task_id");
+                            des.value = `{{t.id}}`
+
+                           
+                            // mod_name.value = `{{t.module_name}}`
+                        // console.log("group id is = " + {{t.group_id}})
+                        }
+                    {% endfor %}
+                    if (data == "success"){
+                        // $("#"+data).remove();
+
+                    }
+                    // window.location.href="/individual_group/";
+                   
+                },
+            error: function()
+                {
+                    console.log("Ajax errro roccured");
+                }
+            
+        });
+    }
+</script>
+
+<!-- script function for edit ends here -->
+
+{% endblock  %}
+

@@ -1,0 +1,110 @@
+{% extends "dashboard.html" %}
+{% block view_member %}
+<h1>Chat here</h1>
+<div class="container">
+    <div class="row">
+
+        <div class="col-md-6" style="margin-top: 50px;">
+            <form action="" id="message_form" class="message_form">
+                <input type="text" name="input_message" id="input_message"><button type="submit">Send</button>
+        
+            </form>
+        <!-- </div> -->
+        <!-- <div class="col-md-6"> -->
+            <h1>YOU : - {{user.first_name}}</h1>
+            <!-- <h1>Recipiant : - Lohit</h1> -->
+            <div class="display_msg" id="display_msg">
+                <ul id="message_list">
+                    {% for message in messages %}
+                    <li>{{message.username}} : {{message.text}}</li>
+                    {% endfor %}
+                </ul>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<script type="text/javascript">
+    let url = `ws://${window.location.host}/ws` + window.location.pathname ;
+        console.log(url);
+        console.log(window.location.pathname);
+        const chatSocket = new WebSocket(url)
+
+        chatSocket.onopen = function (event){
+            console.log("the connection is open....");
+            // chatSocket.send("thanks for connecting ...")
+        }
+
+        chatSocket.onmessage = function(event){
+            console.log("received message from the channels backend ...")
+            console.log(event);
+            const ul = document.getElementById("message_list");
+            //  create a list of each message
+            var li = document.createElement('li');
+            var data = JSON.parse(event.data);
+            li.append(document.createTextNode(
+                '[' + data.username +
+             ' ]:' + data.text
+            ));
+            ul.append(li);
+
+
+            
+            // let data = JSON.parse(event.data)
+            // console.log('Data:', data)
+
+
+            // if(data.type === 'chat'){
+            //     let messages = document.getElementById('messages')
+
+            //     messages.insertAdjacentHTML('beforeend', `<div>
+            //                             <p>${data.message}</p>
+            //                         </div>`)
+
+            // }
+        }
+
+        // let form = document.getElementById('form')
+        // form.addEventListener('submit', (e)=> {
+        //     e.preventDefault()
+        //     let Name = e.target.Name.value
+        //     let Email = e.target.Email.value
+        //     console.log(Name)
+        //     chatSocket.send(JSON.stringify({
+        //         'Name':Name,
+        //         'Email':Email,
+        //         'Service':'BSE'
+        //     }))
+        //     form.reset()
+        // })
+
+        chatSocket.onclose = function (event){
+            console.log(event);
+            console.log("connection closed");
+        }
+
+        chatSocket.onerror = function (event){
+            console.log("something error occured");
+            console.log(event);
+        }
+
+
+        const messageForm = document.getElementById("message_form");
+        messageForm.addEventListener('submit' , sendMessage);
+        function sendMessage(e) {
+            console.log(document.getElementById('input_message').value);
+            if (e.preventDefault()) e.preventDefault();
+
+            chatSocket.send(document.getElementById('input_message').value);
+            messageForm.reset();
+            return false;
+        }
+</script>
+
+
+{% endblock  %}

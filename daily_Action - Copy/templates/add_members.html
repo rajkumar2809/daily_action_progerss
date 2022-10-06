@@ -1,0 +1,20 @@
+{% extends "lead_dashboard.html" %}
+
+
+{% block add_members %}
+<h1>Add Members from here</h1>  
+{% for g in groups %}
+    <h1>{{g.name}}</h1>
+{% endfor %}
+<form action="" method="post">
+    {% csrf_token %}
+    {% for user in users %}
+    <div class="form-group">
+        <input type="checkbox" name="checks[]" value={{user.id}} />{{user.email}}
+    </div>
+    {% endfor %}
+    <div class="form-group">
+        <button class="btn btn-success" > Add Selected</button>
+    </div>
+</form>                
+{% endblock %}
